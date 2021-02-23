@@ -10,7 +10,7 @@ import (
 type post struct {
 	Title string
 	Entry string
-	Info  string
+	Tags  string
 }
 
 // main() contains code adapted from example found in Colly's docs:
@@ -19,19 +19,19 @@ func main() {
 	// Instantiate default collector
 	c := colly.NewCollector()
 
+	c.OnHTML(".post_links a", func(e *colly.HTMLElement) {
+		// Navigate to page
+		e.Request.Visit(e.Attr("href"))
+	})
+
 	// On every a element which has href attribute call callback
-	c.OnHTML(".tag-Dimitri", func(e *colly.HTMLElement) {
+	c.OnHTML(".tag-dimitri", func(e *colly.HTMLElement) {
 		post := post{e.ChildText(".post-title a"), e.ChildText(".entry p"), e.ChildText(".postinfo a")}
 
 		fmt.Println("Title: ", post.Title)
 		fmt.Println("Entry: ", post.Entry)
-		fmt.Println("Info: ", post.Info)
+		fmt.Println("Tags: ", post.Tags)
 		fmt.Println()
-	})
-
-	c.OnHTML(".next_post_links", func(e *colly.HTMLElement) {
-		// Navigate to page
-		e.Request.Visit(e.Attr("href"))
 	})
 
 	// Before making a request print "Visiting ..."
@@ -43,7 +43,7 @@ func main() {
 	c.Visit("https://serenesforest.net/tag/three-houses/")
 }
 
-func writeJson(data []byte, flag int) {
+func writetoJson(data []byte, flag int) {
 	f, err := os.OpenFile("output.json", flag, 0644)
 	checkErr(err)
 	defer f.Close()
