@@ -7,9 +7,9 @@ import (
 )
 
 type post struct {
-	Author string
-	Tag    string
-	Text   string
+	Title string
+	Entry string
+	Info  string
 }
 
 // main() contains code adapted from example found in Colly's docs:
@@ -19,11 +19,11 @@ func main() {
 	c := colly.NewCollector()
 
 	// On every a element which has href attribute call callback
-	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		link := e.Attr("href")
+	c.OnHTML(".tag-dimitri", func(e *colly.HTMLElement) {
+		post := post{e.ChildText(".post-title a"), e.ChildText(".entry p"), e.ChildText(".postinfo a")}
 
 		// Print link
-		fmt.Printf("Link found: %q -> %s\n", e.Text, link)
+		fmt.Printf("Link found: %q -> %s\n", e.Text, post)
 	})
 
 	// Before making a request print "Visiting ..."
@@ -32,5 +32,5 @@ func main() {
 	})
 
 	// Start scraping on https://hackerspaces.org
-	c.Visit("https://hackerspaces.org/")
+	c.Visit("https://serenesforest.net/")
 }
