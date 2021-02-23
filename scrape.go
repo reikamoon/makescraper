@@ -19,11 +19,16 @@ func main() {
 	c := colly.NewCollector()
 
 	// On every a element which has href attribute call callback
-	c.OnHTML(".tag-dimitri", func(e *colly.HTMLElement) {
+	c.OnHTML(".tag-lex", func(e *colly.HTMLElement) {
 		post := post{e.ChildText(".post-title a"), e.ChildText(".entry p"), e.ChildText(".postinfo a")}
 
 		// Print link
 		fmt.Printf("Link found: %q -> %s\n", e.Text, post)
+
+		fmt.Println("Title: ", post.Title)
+		fmt.Println("Entry: ", post.Entry)
+		fmt.Println("Info: ", post.Info)
+		fmt.Println()
 	})
 
 	// Before making a request print "Visiting ..."
