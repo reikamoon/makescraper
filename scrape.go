@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -28,6 +29,12 @@ func main() {
 	c.OnHTML(".tag-dimitri", func(e *colly.HTMLElement) {
 		post := post{e.ChildText(".post-title a"), e.ChildText(".entry p"), e.ChildText(".postinfo a")}
 
+		postJson, err := json.MarshalIndent(post, "", "  ")
+		checkErr(err)
+		fmt.Println(string(postJson))
+
+		writetoJson(postJson, os.O_APPEND)
+
 		fmt.Println("Title: ", post.Title)
 		fmt.Println("Entry: ", post.Entry)
 		fmt.Println("Tags: ", post.Tags)
@@ -44,7 +51,7 @@ func main() {
 }
 
 func writetoJson(data []byte, flag int) {
-	f, err := os.OpenFile("output.json", flag, 0644)
+	f, err := os.OpenFile("output.json", flag|os.O_WRONLY, 0644)
 	checkErr(err)
 	defer f.Close()
 
