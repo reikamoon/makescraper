@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gocolly/colly"
 )
@@ -19,16 +20,18 @@ func main() {
 	c := colly.NewCollector()
 
 	// On every a element which has href attribute call callback
-	c.OnHTML(".tag-lex", func(e *colly.HTMLElement) {
+	c.OnHTML(".tag-Dimitri", func(e *colly.HTMLElement) {
 		post := post{e.ChildText(".post-title a"), e.ChildText(".entry p"), e.ChildText(".postinfo a")}
-
-		// Print link
-		fmt.Printf("Link found: %q -> %s\n", e.Text, post)
 
 		fmt.Println("Title: ", post.Title)
 		fmt.Println("Entry: ", post.Entry)
 		fmt.Println("Info: ", post.Info)
 		fmt.Println()
+	})
+
+	c.OnHTML(".next_post_links", func(e *colly.HTMLElement) {
+		// Navigate to page
+		e.Request.Visit(e.Attr("href"))
 	})
 
 	// Before making a request print "Visiting ..."
@@ -37,5 +40,21 @@ func main() {
 	})
 
 	// Start scraping on https://hackerspaces.org
-	c.Visit("https://serenesforest.net/")
+	c.Visit("https://serenesforest.net/tag/three-houses/")
+}
+
+func writeJson(data []byte, flag int) {
+	f, err := os.OpenFile("output.json", flag, 0644)
+	checkErr(err)
+	defer f.Close()
+
+	n, err := f.Write(data)
+	checkErr(err)
+	fmt.Printf("Wrote %d bytes to %s\n", n, f.Name())
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
